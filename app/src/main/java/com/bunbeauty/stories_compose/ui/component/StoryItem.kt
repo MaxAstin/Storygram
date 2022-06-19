@@ -1,4 +1,4 @@
-package com.bunbeauty.stories_compose
+package com.bunbeauty.stories_compose.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.bunbeauty.stories_compose.Story
 import com.bunbeauty.stories_compose.ui.theme.*
 
 private val storyBrush = Brush.linearGradient(
@@ -42,14 +43,14 @@ fun SuccessStoryItem(
             Spacer(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(2.dp)
+                    .padding(3.dp)
                     .clip(CircleShape)
                     .background(Gray300)
             )
             AsyncImage(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(3.dp)
+                    .padding(5.dp)
                     .clip(CircleShape),
                 model = story.previewLink,
                 contentDescription = "story"

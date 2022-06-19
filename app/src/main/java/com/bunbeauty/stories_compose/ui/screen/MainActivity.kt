@@ -1,4 +1,4 @@
-package com.bunbeauty.stories_compose
+package com.bunbeauty.stories_compose.ui.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,6 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.bunbeauty.stories_compose.Story
+import com.bunbeauty.stories_compose.ui.component.LoadingStoryItem
+import com.bunbeauty.stories_compose.ui.component.SuccessStoryItem
 import com.bunbeauty.stories_compose.ui.theme.Stories_ComposeTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

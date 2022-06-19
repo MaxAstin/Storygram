@@ -1,4 +1,4 @@
-package com.bunbeauty.stories_compose
+package com.bunbeauty.stories_compose.ui.component
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
