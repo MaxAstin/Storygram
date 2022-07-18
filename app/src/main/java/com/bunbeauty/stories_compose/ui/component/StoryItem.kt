@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
-import com.bunbeauty.stories_compose.Story
+import com.bunbeauty.stories_compose.model.StoryPreview
 import com.bunbeauty.stories_compose.ui.theme.*
 
 private val storyBrush = Brush.linearGradient(
@@ -34,7 +34,7 @@ private val storyBrush = Brush.linearGradient(
 @Composable
 fun SuccessStoryItem(
     modifier: Modifier = Modifier,
-    story: Story.Success
+    story: StoryPreview.Success
 ) {
     Column(modifier = modifier) {
         Box(modifier = Modifier.size(storyPreviewSize)) {
@@ -101,7 +101,7 @@ fun LoadingStoryItem(modifier: Modifier = Modifier) {
 private fun SuccessPreview() {
     SuccessStoryItem(
         modifier = Modifier.padding(end = 8.dp),
-        story = Story.Success("#1", "")
+        story = StoryPreview.Success("#1", "")
     )
 }
 
