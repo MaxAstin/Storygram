@@ -57,7 +57,7 @@ fun SuccessStoryItem(
                     .padding(4.dp)
                     .clip(CircleShape),
                 imageLink = story.previewLink,
-                cacheKey = story.name
+                cacheKey = story.groupId.toString()
             )
         }
         Text(

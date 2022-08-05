@@ -13,6 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.bunbeauty.stories_compose.model.StoryState
 import com.bunbeauty.stories_compose.ui.theme.Gray400
+import com.bunbeauty.stories_compose.ui.theme.White
 
 private const val PROGRESS_START_VALUE = 0f
 private const val PROGRESS_FINISH_VALUE = 1f
@@ -62,7 +63,7 @@ fun StoryProgressIndicator(
         modifier = modifier
             .height(4.dp)
             .clip(RoundedCornerShape(2.dp)),
-        color = Gray400,
+        color = White,
         progress = progress
     )
 }

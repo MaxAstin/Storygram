@@ -12,7 +12,7 @@ import coil.request.ImageRequest
 fun CachedImage(
     modifier: Modifier = Modifier,
     imageLink: String,
-    cacheKey: String
+    cacheKey: String? = null
 ) {
     AsyncImage(
         modifier = modifier,

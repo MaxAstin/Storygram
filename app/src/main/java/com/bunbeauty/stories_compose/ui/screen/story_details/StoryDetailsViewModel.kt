@@ -9,7 +9,6 @@ import com.bunbeauty.stories_compose.model.StoryGroup
 import com.bunbeauty.stories_compose.model.StoryState
 import com.bunbeauty.stories_compose.navigation.Arguments.GROUP_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +30,8 @@ class StoryDetailsViewModel @Inject constructor(
                 storyGroupList = List(3) { i ->
                     StoryGroup(
                         groupId = i,
-                        name = "story#$i",
-                        previewLink = "https://picsum.photos/100",
+                        name = "story #$i",
+                        previewLink = "https://picsum.photos/id/$i/100",
                         isCurrent = i == groupId,
                         storyList = List(4) { j ->
                             val storyState = when {
@@ -50,10 +49,11 @@ class StoryDetailsViewModel @Inject constructor(
                                     StoryState.NOT_SHOWN
                                 }
                             }
+                            val storyId = i * 100 + j
                             Story(
-                                id = i * 100 + j,
+                                id = storyId,
                                 state = storyState,
-                                link = "https://picsum.photos/500"
+                                link = "https://picsum.photos/id/$storyId/500"
                             )
                         }
                     )
