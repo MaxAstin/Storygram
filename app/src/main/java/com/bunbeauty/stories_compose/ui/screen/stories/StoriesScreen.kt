@@ -2,49 +2,45 @@ package com.bunbeauty.stories_compose.ui.screen.stories
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.bunbeauty.stories_compose.model.StoryPreview
+import com.bunbeauty.stories_compose.navigation.Destinations.STORY_DETAILS_ROTE
 import com.bunbeauty.stories_compose.ui.component.LoadingStoryItem
 import com.bunbeauty.stories_compose.ui.component.SuccessStoryItem
 import com.bunbeauty.stories_compose.ui.theme.Stories_ComposeTheme
 import com.bunbeauty.stories_compose.ui.theme.getStartPadding
-import kotlinx.coroutines.delay
 
 @Composable
-fun StoriesScreen() {
-    var storiesState: StoriesState by remember { mutableStateOf(StoriesState.Loading) }
+fun StoriesScreen(
+    navController: NavController,
+    viewModel: StoriesViewModel = hiltViewModel()
+) {
+    val storiesState: StoriesState by viewModel.storiesState.collectAsState()
     Stories_ComposeTheme {
-        Stories(storiesState)
-    }
-    LaunchedEffect(rememberScaffoldState()) {
-        delay(2_000L)
-        storiesState = StoriesState.Success(
-            List(10) { i ->
-                delay(100)
-                StoryPreview(
-                    groupId = i,
-                    name = "story #$i",
-                    previewLink = "https://picsum.photos/100"
-                )
-            }
-        )
+        Stories(storiesState, navController)
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Stories(storiesState: StoriesState) {
+private fun Stories(storiesState: StoriesState, navController: NavController) {
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
     ) {
@@ -53,7 +49,7 @@ private fun Stories(storiesState: StoriesState) {
                 LoadingStories()
             }
             is StoriesState.Success -> {
-                SuccessStories(storiesState.storyPreviewList)
+                SuccessStories(storiesState.storyPreviewList, navController)
             }
         }
     }
@@ -73,11 +69,15 @@ private fun LoadingStories() {
 }
 
 @Composable
-private fun SuccessStories(storyPreviewList: List<StoryPreview>) {
+private fun SuccessStories(storyPreviewList: List<StoryPreview>, navController: NavController) {
     LazyRow(contentPadding = PaddingValues(12.dp)) {
         itemsIndexed(storyPreviewList) { i, story ->
             SuccessStoryItem(
-                modifier = Modifier.padding(start = getStartPadding(i)),
+                modifier = Modifier
+                    .clickable {
+                        navController.navigate("$STORY_DETAILS_ROTE/${story.groupId}")
+                    }
+                    .padding(start = getStartPadding(i)),
                 story = story
             )
         }
@@ -87,12 +87,14 @@ private fun SuccessStories(storyPreviewList: List<StoryPreview>) {
 @Preview
 @Composable
 private fun LoadingStoriesPreview() {
-    Stories(StoriesState.Loading)
+    val navController = rememberNavController()
+    Stories(StoriesState.Loading, navController)
 }
 
 @Preview
 @Composable
 private fun SuccessStoriesPreview() {
+    val navController = rememberNavController()
     Stories(
         StoriesState.Success(
             listOf(
@@ -112,6 +114,7 @@ private fun SuccessStoriesPreview() {
                     previewLink = "",
                 ),
             )
-        )
+        ),
+        navController
     )
 }

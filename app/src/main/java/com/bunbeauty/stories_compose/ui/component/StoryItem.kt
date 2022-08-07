@@ -51,19 +51,13 @@ fun SuccessStoryItem(
                     .clip(CircleShape)
                     .background(Gray300)
             )
-            AsyncImage(
+            CachedImage(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(4.dp)
                     .clip(CircleShape),
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(story.previewLink)
-                    .crossfade(true)
-                    .diskCachePolicy(CachePolicy.DISABLED)
-                    .memoryCachePolicy(CachePolicy.ENABLED)
-                    .memoryCacheKey(story.name)
-                    .build(),
-                contentDescription = "story",
+                imageLink = story.previewLink,
+                cacheKey = story.name
             )
         }
         Text(
