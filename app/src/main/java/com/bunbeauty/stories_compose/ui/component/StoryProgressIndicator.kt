@@ -1,6 +1,5 @@
 package com.bunbeauty.stories_compose.ui.component
 
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.core.VectorConverter
@@ -17,6 +16,8 @@ import com.bunbeauty.stories_compose.ui.theme.Gray400
 
 private const val PROGRESS_START_VALUE = 0f
 private const val PROGRESS_FINISH_VALUE = 1f
+private const val PLAY_TIME_START_MILLIS = 0L
+private const val PLAY_TIME_FINISH_MILLIS = 5_000
 
 @Composable
 fun StoryProgressIndicator(
@@ -27,13 +28,13 @@ fun StoryProgressIndicator(
 ) {
     val animation = remember {
         TargetBasedAnimation(
-            animationSpec = tween(durationMillis = 5_000, easing = LinearEasing),
+            animationSpec = tween(durationMillis = PLAY_TIME_FINISH_MILLIS, easing = LinearEasing),
             typeConverter = Float.VectorConverter,
             initialValue = PROGRESS_START_VALUE,
             targetValue = PROGRESS_FINISH_VALUE
         )
     }
-    var playTime by remember { mutableStateOf(0L) }
+    var playTime by remember { mutableStateOf(PLAY_TIME_START_MILLIS) }
     var progressAnimationValue by remember { mutableStateOf(PROGRESS_START_VALUE) }
 
     if (storyState == StoryState.IN_PROGRESS) {
@@ -47,6 +48,9 @@ fun StoryProgressIndicator(
                 }
             }
         }
+    } else {
+        playTime = PLAY_TIME_START_MILLIS
+        progressAnimationValue = PROGRESS_START_VALUE
     }
 
     val progress = when (storyState) {

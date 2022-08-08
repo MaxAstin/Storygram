@@ -2,15 +2,15 @@ package com.bunbeauty.stories_compose.ui.screen
 
 import android.view.MotionEvent
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
@@ -22,10 +22,12 @@ import com.bunbeauty.stories_compose.model.StoryState
 import com.bunbeauty.stories_compose.ui.component.StoryProgressIndicator
 import com.bunbeauty.stories_compose.ui.theme.getStartPadding
 
+private const val MAX_TIME_FOR_CLICK = 300L
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StoryDetailsScreen() {
-    val storyDetailsState = remember {
+    var storyDetailsState by remember {
         mutableStateOf(
             StoryDetails(
                 name = "story #$0",
@@ -60,20 +62,31 @@ fun StoryDetailsScreen() {
             )
         )
     }
+    var boxSize by remember { mutableStateOf(IntSize.Zero) }
+    var lastDownTime by remember { mutableStateOf(0L) }
     Box(
         modifier = Modifier
             .fillMaxSize()
             .pointerInteropFilter { event: MotionEvent ->
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
-                        storyDetailsState.value = storyDetailsState.value.copy(isPause = true)
+                        lastDownTime = System.currentTimeMillis()
+                        storyDetailsState = storyDetailsState.copy(isPause = true)
                     }
                     MotionEvent.ACTION_UP -> {
-                        storyDetailsState.value = storyDetailsState.value.copy(isPause = false)
+                        val upTime = System.currentTimeMillis()
+                        if (upTime - lastDownTime <= MAX_TIME_FOR_CLICK) {
+                            val isNext = event.x > boxSize.width / 2
+                            storyDetailsState = storyDetailsState.copy(
+                                storyList = changeStory(storyDetailsState.storyList, isNext)
+                            )
+                        }
+                        storyDetailsState = storyDetailsState.copy(isPause = false)
                     }
                 }
                 true
             }
+            .onSizeChanged { size -> boxSize = size }
     ) {
         Row(
             modifier = Modifier
@@ -81,21 +94,21 @@ fun StoryDetailsScreen() {
                 .padding(8.dp)
                 .zIndex(1f)
         ) {
-            storyDetailsState.value.storyList.forEachIndexed { index, story ->
+            storyDetailsState.storyList.forEachIndexed { index, story ->
                 StoryProgressIndicator(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = getStartPadding(index, 4.dp)),
-                    isPaused = storyDetailsState.value.isPause,
+                    isPaused = storyDetailsState.isPause,
                     storyState = story.state,
                 ) {
-                    storyDetailsState.value = storyDetailsState.value.copy(
-                        storyList = nextStory(storyDetailsState.value.storyList)
+                    storyDetailsState = storyDetailsState.copy(
+                        storyList = changeStory(storyDetailsState.storyList, true)
                     )
                 }
             }
         }
-        storyDetailsState.value.storyList.find { story ->
+        storyDetailsState.storyList.find { story ->
             story.state == StoryState.IN_PROGRESS
         }?.let { story ->
             AsyncImage(
@@ -113,26 +126,49 @@ fun StoryDetailsScreen() {
     }
 }
 
-private fun nextStory(storyList: List<Story>): List<Story> {
-    val newStoryList = mutableListOf<Story>()
-    storyList.forEachIndexed { i, story ->
+private fun changeStory(storyList: List<Story>, isNext: Boolean): List<Story> {
+    return storyList.mapIndexed { i, story ->
         when (story.state) {
             StoryState.SHOWN -> {
-                newStoryList.add(story)
+                updateShown(
+                    isNext = isNext,
+                    story = story,
+                    nextStory = storyList.getOrNull(i + 1)
+                )
             }
             StoryState.IN_PROGRESS -> {
-                newStoryList.add(story.copy(state = StoryState.SHOWN))
+                updateInProgress(isNext = isNext, story = story)
             }
             StoryState.NOT_SHOWN -> {
-                if (i == 0 || storyList[i - 1].state == StoryState.IN_PROGRESS) {
-                    newStoryList.add(story.copy(state = StoryState.IN_PROGRESS))
-                } else {
-                    newStoryList.add(story)
-                }
+                updateNotShown(
+                    isNext = isNext,
+                    story = story,
+                    previousStory = storyList.getOrNull(i - 1)
+                )
             }
         }
     }
-    return newStoryList.toList()
+}
+
+private fun updateShown(isNext: Boolean, story: Story, nextStory: Story?): Story {
+    return if (!isNext && (nextStory?.state == StoryState.IN_PROGRESS)) {
+        story.copy(state = StoryState.IN_PROGRESS)
+    } else {
+        story
+    }
+}
+
+private fun updateInProgress(isNext: Boolean, story: Story): Story {
+    val newState = if (isNext) StoryState.SHOWN else StoryState.NOT_SHOWN
+    return story.copy(state = newState)
+}
+
+private fun updateNotShown(isNext: Boolean, story: Story, previousStory: Story?): Story {
+    return if (isNext && (previousStory == null || previousStory.state == StoryState.IN_PROGRESS)) {
+        story.copy(state = StoryState.IN_PROGRESS)
+    } else {
+        story
+    }
 }
 
 @Composable
