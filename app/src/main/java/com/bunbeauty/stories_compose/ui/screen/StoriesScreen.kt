@@ -1,7 +1,7 @@
 package com.bunbeauty.stories_compose.ui.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -37,7 +37,7 @@ fun StoriesScreen() {
 @Composable
 private fun Stories(storyList: List<StoryPreview>) {
     CompositionLocalProvider(
-        LocalOverScrollConfiguration provides null
+        LocalOverscrollConfiguration provides null
     ) {
         LazyRow(contentPadding = PaddingValues(12.dp)) {
             itemsIndexed(storyList) { i, story ->
