@@ -18,6 +18,7 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.bunbeauty.stories_compose.model.Story
 import com.bunbeauty.stories_compose.model.StoryDetails
+import com.bunbeauty.stories_compose.model.StoryGroup
 import com.bunbeauty.stories_compose.model.StoryState
 import com.bunbeauty.stories_compose.ui.component.StoryProgressIndicator
 import com.bunbeauty.stories_compose.ui.theme.getStartPadding
@@ -27,36 +28,66 @@ private const val MAX_TIME_FOR_CLICK = 300L
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun StoryDetailsScreen() {
-    var storyDetailsState by remember {
+    var storyDetails by remember {
         mutableStateOf(
             StoryDetails(
-                name = "story #$0",
-                storyList = listOf(
-                    Story(
-                        id = 0,
-                        state = StoryState.IN_PROGRESS,
-                        link = "https://picsum.photos/500"
+                storyGroupList = listOf(
+                    StoryGroup(
+                        groupId = 1,
+                        name = "story#1",
+                        previewLink = "https://picsum.photos/100",
+                        isCurrent = true,
+                        storyList = listOf(
+                            Story(
+                                id = 0,
+                                state = StoryState.IN_PROGRESS,
+                                link = "https://picsum.photos/500"
+                            ),
+                            Story(
+                                id = 1,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            ),
+                            Story(
+                                id = 2,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            ),
+                            Story(
+                                id = 3,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            ),
+                            Story(
+                                id = 4,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            ),
+                        )
                     ),
-                    Story(
-                        id = 1,
-                        state = StoryState.NOT_SHOWN,
-                        link = "https://picsum.photos/500"
-                    ),
-                    Story(
-                        id = 2,
-                        state = StoryState.NOT_SHOWN,
-                        link = "https://picsum.photos/500"
-                    ),
-                    Story(
-                        id = 3,
-                        state = StoryState.NOT_SHOWN,
-                        link = "https://picsum.photos/500"
-                    ),
-                    Story(
-                        id = 4,
-                        state = StoryState.NOT_SHOWN,
-                        link = "https://picsum.photos/500"
-                    ),
+                    StoryGroup(
+                        groupId = 2,
+                        name = "story#2",
+                        previewLink = "https://picsum.photos/100",
+                        isCurrent = false,
+                        storyList = listOf(
+                            Story(
+                                id = 0,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            ),
+                            Story(
+                                id = 1,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            ),
+                            Story(
+                                id = 2,
+                                state = StoryState.NOT_SHOWN,
+                                link = "https://picsum.photos/500"
+                            )
+                        )
+                    )
                 ),
                 isPause = false
             )
@@ -71,17 +102,15 @@ fun StoryDetailsScreen() {
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
                         lastDownTime = System.currentTimeMillis()
-                        storyDetailsState = storyDetailsState.copy(isPause = true)
+                        storyDetails = storyDetails.copy(isPause = true)
                     }
                     MotionEvent.ACTION_UP -> {
                         val upTime = System.currentTimeMillis()
                         if (upTime - lastDownTime <= MAX_TIME_FOR_CLICK) {
                             val isNext = event.x > boxSize.width / 2
-                            storyDetailsState = storyDetailsState.copy(
-                                storyList = changeStory(storyDetailsState.storyList, isNext)
-                            )
+                            storyDetails = updateStoryDetails(storyDetails, isNext)
                         }
-                        storyDetailsState = storyDetailsState.copy(isPause = false)
+                        storyDetails = storyDetails.copy(isPause = false)
                     }
                 }
                 true
@@ -94,23 +123,19 @@ fun StoryDetailsScreen() {
                 .padding(8.dp)
                 .zIndex(1f)
         ) {
-            storyDetailsState.storyList.forEachIndexed { index, story ->
+            storyDetails.currentStoryGroup?.storyList?.forEachIndexed { index, story ->
                 StoryProgressIndicator(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = getStartPadding(index, 4.dp)),
-                    isPaused = storyDetailsState.isPause,
+                    isPaused = storyDetails.isPause,
                     storyState = story.state,
                 ) {
-                    storyDetailsState = storyDetailsState.copy(
-                        storyList = changeStory(storyDetailsState.storyList, true)
-                    )
+                    storyDetails = updateStoryDetails(storyDetails, true)
                 }
             }
         }
-        storyDetailsState.storyList.find { story ->
-            story.state == StoryState.IN_PROGRESS
-        }?.let { story ->
+        storyDetails.currentStoryGroup?.currentStory?.let { story ->
             AsyncImage(
                 modifier = Modifier.fillMaxSize(),
                 model = ImageRequest.Builder(LocalContext.current)
@@ -126,7 +151,19 @@ fun StoryDetailsScreen() {
     }
 }
 
-private fun changeStory(storyList: List<Story>, isNext: Boolean): List<Story> {
+private fun updateStoryDetails(storyDetails: StoryDetails, isNext: Boolean): StoryDetails {
+    return storyDetails.copy(
+        storyGroupList = storyDetails.storyGroupList.map { storyGroup ->
+            if (storyGroup.isCurrent) {
+                storyGroup.copy(storyList = updateStoryList(storyGroup.storyList, isNext))
+            } else {
+                storyGroup
+            }
+        }
+    )
+}
+
+private fun updateStoryList(storyList: List<Story>, isNext: Boolean): List<Story> {
     return storyList.mapIndexed { i, story ->
         when (story.state) {
             StoryState.SHOWN -> {

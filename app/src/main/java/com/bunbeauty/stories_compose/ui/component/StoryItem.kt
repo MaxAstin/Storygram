@@ -34,7 +34,7 @@ private val storyBrush = Brush.linearGradient(
 @Composable
 fun SuccessStoryItem(
     modifier: Modifier = Modifier,
-    story: StoryPreview.Success
+    story: StoryPreview
 ) {
     Column(modifier = modifier) {
         Box(modifier = Modifier.size(storyPreviewSize)) {
@@ -101,7 +101,11 @@ fun LoadingStoryItem(modifier: Modifier = Modifier) {
 private fun SuccessPreview() {
     SuccessStoryItem(
         modifier = Modifier.padding(end = 8.dp),
-        story = StoryPreview.Success("#1", "")
+        story = StoryPreview(
+            groupId = 1,
+            name = "story #1",
+            previewLink = "",
+        )
     )
 }
 

@@ -1,7 +1,9 @@
 package com.bunbeauty.stories_compose.model
 
 data class StoryDetails(
-    val name: String,
-    val storyList: List<Story>,
-    val isPause: Boolean
-)
+    val storyGroupList: List<StoryGroup>,
+    val isPause: Boolean,
+) {
+    val currentStoryGroup: StoryGroup?
+        get() = storyGroupList.find { it.isCurrent }
+}
