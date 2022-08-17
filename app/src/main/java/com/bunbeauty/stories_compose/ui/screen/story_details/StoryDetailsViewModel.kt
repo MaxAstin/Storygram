@@ -27,7 +27,7 @@ class StoryDetailsViewModel @Inject constructor(
         val groupId = savedStateHandle[GROUP_ID] ?: 0
         viewModelScope.launch {
             mutableStoryDetailsState.value = StoryDetails(
-                storyGroupList = List(3) { i ->
+                storyGroupList = List(10) { i ->
                     StoryGroup(
                         groupId = i,
                         name = "story #$i",

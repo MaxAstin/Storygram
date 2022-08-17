@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
                         defaultValue = 0
                     })
                 ) {
-                    StoryDetailsScreen()
+                    StoryDetailsScreen(navController)
                 }
             }
         }
