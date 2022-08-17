@@ -52,6 +52,7 @@ class StoryDetailsViewModel @Inject constructor(
                             val storyId = i * 100 + j
                             Story(
                                 id = storyId,
+                                groupId = i,
                                 state = storyState,
                                 link = "https://picsum.photos/id/$storyId/500"
                             )
@@ -72,22 +73,29 @@ class StoryDetailsViewModel @Inject constructor(
     }
 
     fun switchStoryToNext() {
-        updateStory(true)
+        return updateStory(true)
     }
 
     fun switchStoryToPrevious() {
-        updateStory(false)
+        return updateStory(false)
     }
 
     private fun updateStory(isNext: Boolean) {
         mutableStoryDetailsState.value?.let { storyDetails ->
             mutableStoryDetailsState.value = storyDetails.copy(
-                storyGroupList = storyDetails.storyGroupList.map { storyGroup ->
-                    if (storyGroup.isCurrent) {
-                        storyGroup.copy(storyList = updateStoryList(storyGroup.storyList, isNext))
-                    } else {
-                        storyGroup
-                    }
+                storyGroupList = storyDetails.storyGroupList.flatMap { storyGroup ->
+                    storyGroup.storyList
+                }.let { allStoryList ->
+                    updateStoryList(allStoryList, isNext)
+                }.groupBy { story ->
+                    story.groupId
+                }.mapNotNull { (groupId, storyList) ->
+                    storyDetails.storyGroupList.find { storyGroup ->
+                        storyGroup.groupId == groupId
+                    }?.copy(
+                        storyList = storyList,
+                        isCurrent = storyList.any { it.state == StoryState.IN_PROGRESS }
+                    )
                 }
             )
         }

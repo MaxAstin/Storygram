@@ -6,4 +6,8 @@ data class StoryDetails(
 ) {
     val currentStoryGroup: StoryGroup?
         get() = storyGroupList.find { it.isCurrent }
+    val isEdgeReached: Boolean
+        get() = currentStoryGroup?.let { storyGroup ->
+            storyGroup.storyList.none { story -> story.state == StoryState.IN_PROGRESS }
+        } ?: true
 }

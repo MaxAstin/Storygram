@@ -1,7 +1,6 @@
 package com.bunbeauty.stories_compose.ui.screen.story_details
 
 import android.view.MotionEvent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bunbeauty.stories_compose.ui.component.CachedImage
-import com.bunbeauty.stories_compose.ui.theme.White
 
 private const val MAX_TIME_FOR_CLICK = 300L
 
@@ -32,6 +30,12 @@ fun StoryDetailsScreen(
     val storyDetailsState by viewModel.storyDetailsState.collectAsState()
     var boxSize by remember { mutableStateOf(IntSize.Zero) }
     var lastDownTime by remember { mutableStateOf(0L) }
+
+    if (storyDetailsState?.isEdgeReached == true) {
+        LaunchedEffect(Unit) {
+            navController.popBackStack()
+        }
+    }
 
     fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
