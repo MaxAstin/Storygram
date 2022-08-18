@@ -12,6 +12,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -19,6 +20,9 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.imageLoader
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.bunbeauty.stories_compose.ui.component.CachedImageWithLoading
 import com.bunbeauty.stories_compose.ui.theme.Gray400
 
@@ -37,6 +41,18 @@ fun StoryDetailsScreen(
     if (storyDetailsState?.isEdgeReached == true) {
         LaunchedEffect(Unit) {
             navController.popBackStack()
+        }
+    }
+
+    val context = LocalContext.current
+    LaunchedEffect(storyDetailsState?.currentStoryGroup?.currentStory) {
+        viewModel.getStoryListForPreloading()?.forEach { story ->
+            val request = ImageRequest.Builder(context)
+                .data(story.link)
+                .diskCachePolicy(CachePolicy.DISABLED)
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .build()
+            context.imageLoader.enqueue(request)
         }
     }
 

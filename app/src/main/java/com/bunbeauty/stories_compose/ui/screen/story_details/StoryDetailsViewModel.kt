@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
+
+private const val PRELOADING_STORY_OFFSET = 2
 
 @HiltViewModel
 class StoryDetailsViewModel @Inject constructor(
@@ -78,6 +82,24 @@ class StoryDetailsViewModel @Inject constructor(
 
     fun switchStoryToPrevious() {
         return updateStory(false)
+    }
+
+    fun getStoryListForPreloading(): List<Story>? {
+        return mutableStoryDetailsState.value?.let { storyDetails ->
+            val allStoryList = storyDetails.storyGroupList.flatMap { storyGroup ->
+                storyGroup.storyList
+            }
+            val currentStoryIndex = allStoryList.indexOfFirst { story ->
+                story.id == storyDetails.currentStoryGroup?.currentStory?.id
+            }
+            val previousFromIndex = max(0, currentStoryIndex - PRELOADING_STORY_OFFSET)
+            val previousToIndex = max(0, currentStoryIndex - 1)
+            val nextFromIndex = min(allStoryList.lastIndex, currentStoryIndex + 1)
+            val nextToIndex =
+                min(allStoryList.lastIndex, currentStoryIndex + PRELOADING_STORY_OFFSET)
+            allStoryList.slice(previousFromIndex..previousToIndex) +
+                    allStoryList.slice(nextFromIndex..nextToIndex)
+        }
     }
 
     private fun updateStory(isNext: Boolean) {

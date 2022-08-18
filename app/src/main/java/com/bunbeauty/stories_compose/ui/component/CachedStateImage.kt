@@ -1,5 +1,6 @@
 package com.bunbeauty.stories_compose.ui.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import coil.compose.AsyncImagePainter
@@ -14,15 +15,17 @@ fun CachedImageWithLoading(
     var isLoading: Boolean by remember {
         mutableStateOf(true)
     }
-    CachedImage(
-        modifier = modifier,
-        imageLink = imageLink,
-        cacheKey = cacheKey,
-        onState = {
-            isLoading = it is AsyncImagePainter.State.Loading
+    Box {
+        CachedImage(
+            modifier = modifier,
+            imageLink = imageLink,
+            cacheKey = cacheKey,
+            onState = {
+                isLoading = it is AsyncImagePainter.State.Loading
+            }
+        )
+        if (isLoading) {
+            Loading(modifier = modifier)
         }
-    )
-    if (isLoading) {
-        Loading(modifier = modifier)
     }
 }

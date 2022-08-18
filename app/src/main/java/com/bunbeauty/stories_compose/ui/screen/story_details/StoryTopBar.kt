@@ -21,6 +21,8 @@ import com.bunbeauty.stories_compose.model.StoryDetails
 import com.bunbeauty.stories_compose.model.StoryGroup
 import com.bunbeauty.stories_compose.model.StoryState
 import com.bunbeauty.stories_compose.ui.component.CachedImage
+import com.bunbeauty.stories_compose.ui.component.CachedImageWithLoading
+import com.bunbeauty.stories_compose.ui.component.Shimmer
 import com.bunbeauty.stories_compose.ui.component.StoryProgressIndicator
 import com.bunbeauty.stories_compose.ui.theme.TransientBlack
 import com.bunbeauty.stories_compose.ui.theme.White
@@ -48,13 +50,15 @@ fun StoryTopBar(
         }
         storyDetails.currentStoryGroup?.let { storyGroup ->
             Row(modifier = Modifier.padding(top = 8.dp)) {
-                CachedImage(
+                CachedImageWithLoading(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape),
                     imageLink = storyGroup.previewLink,
                     cacheKey = storyGroup.groupId.toString()
-                )
+                ) { modifier ->
+                    Shimmer(modifier)
+                }
                 Text(
                     modifier = Modifier
                         .padding(start = 8.dp)
