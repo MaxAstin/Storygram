@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -17,7 +19,8 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.bunbeauty.stories_compose.ui.component.CachedImage
+import com.bunbeauty.stories_compose.ui.component.CachedImageWithLoading
+import com.bunbeauty.stories_compose.ui.theme.Gray400
 
 private const val MAX_TIME_FOR_CLICK = 300L
 
@@ -83,10 +86,17 @@ fun StoryDetailsScreen(
             }
 
             storyDetails.currentStoryGroup?.currentStory?.let { story ->
-                CachedImage(
+                CachedImageWithLoading(
                     modifier = Modifier.fillMaxSize(),
                     imageLink = story.link
-                )
+                ) { modifier ->
+                    Box(modifier) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center),
+                            color = Gray400
+                        )
+                    }
+                }
             }
         }
     }

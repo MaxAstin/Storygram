@@ -101,16 +101,19 @@ private fun StoryTopBarPreview() {
                     storyList = listOf(
                         Story(
                             id = 0,
+                            groupId = 0,
                             state = StoryState.IN_PROGRESS,
                             link = ""
                         ),
                         Story(
                             id = 1,
+                            groupId = 0,
                             state = StoryState.NOT_SHOWN,
                             link = ""
                         ),
                         Story(
                             id = 2,
+                            groupId = 0,
                             state = StoryState.NOT_SHOWN,
                             link = ""
                         ),

@@ -97,23 +97,13 @@ private fun SuccessStoriesPreview() {
     val navController = rememberNavController()
     Stories(
         StoriesState.Success(
-            listOf(
+            List(10) { i ->
                 StoryPreview(
-                    groupId = 1,
-                    name = "story #1",
+                    groupId = i,
+                    name = "story #$i",
                     previewLink = "",
-                ),
-                StoryPreview(
-                    groupId = 2,
-                    name = "story #2",
-                    previewLink = "",
-                ),
-                StoryPreview(
-                    groupId = 3,
-                    name = "story #3",
-                    previewLink = "",
-                ),
-            )
+                )
+            }
         ),
         navController
     )

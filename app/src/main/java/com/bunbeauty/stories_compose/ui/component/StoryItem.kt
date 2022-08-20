@@ -51,14 +51,16 @@ fun SuccessStoryItem(
                     .clip(CircleShape)
                     .background(Gray300)
             )
-            CachedImage(
+            CachedImageWithLoading(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(4.dp)
                     .clip(CircleShape),
                 imageLink = story.previewLink,
                 cacheKey = story.groupId.toString()
-            )
+            ) { modifier ->
+                Shimmer(modifier)
+            }
         }
         Text(
             modifier = Modifier

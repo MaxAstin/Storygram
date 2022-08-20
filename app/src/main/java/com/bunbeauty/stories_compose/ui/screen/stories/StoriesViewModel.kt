@@ -26,7 +26,7 @@ class StoriesViewModel @Inject constructor() : ViewModel() {
                     StoryPreview(
                         groupId = i,
                         name = "story #$i",
-                        previewLink = "https://picsum.photos/id/${i * 99}/100"
+                        previewLink = "https://picsum.photos/id/${i * 98}/100"
                     )
                 }
             )
